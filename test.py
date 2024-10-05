@@ -1,5 +1,8 @@
-from utils.logger import logger
+from crawler.spiders.job_spider import JobSpider
+from crawler.spiders.job_spider import JobSpider
+from scrapy.crawler import CrawlerProcess
 
-logger.info('开始爬取数据...')
-logger.debug('爬取到数据:')
-logger.error('fatal error!')
+
+process = CrawlerProcess()
+process.crawl(JobSpider)
+process.start()
