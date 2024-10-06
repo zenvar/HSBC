@@ -8,6 +8,11 @@ config = Config()
 class JobSpider(scrapy.Spider):
     name = 'job_spider'
     start_urls = [config.get('crawler_url', 'fullurl')]
+    custom_settings = {
+        'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36'
+    }
+    max_pages = 6  # 定义最大翻页数
+    page_counter = 1  # 计数当前的页数
 
     def parse(self, response):
         results_div = response.css('div.section__content__results')
@@ -33,11 +38,20 @@ class JobSpider(scrapy.Spider):
                     'location': job_location,
                     'date': job_date
                 })
+            
+        # 翻页逻辑
+        if self.page_counter < self.max_pages:  # 如果当前页数小于最大页数
+            next_page_url = response.css('a.paginationNextLink::attr(href)').get()  # 获取下一页的链接
+            if next_page_url:  # 如果存在下一页的链接
+                self.page_counter += 1  # 增加当前页数计数
+                logger.info('-----Next page, page %s ------',self.page_counter)
+                yield scrapy.Request(next_page_url, callback=self.parse)  # 请求下一页
+
 
     def parse_job_detail(self, response):
         job_id = response.css('div.article__content__view__field.field--w--icon.view-icon--pen div.article__content__view__field__value::text').get()
         job_id = re.sub(r'\s+', ' ', job_id).strip()  # 将多个空白字符替换成一个空格，并去除开头和结尾的空格
-        
+
         job_description = response.css('div.section__content *::text').getall()
         job_description = ' '.join(job_description)  # 先将列表拼接成字符串
         job_description = re.sub(r'\s+', ' ', job_description)  # 将多个空白字符替换成一个空格
@@ -45,7 +59,7 @@ class JobSpider(scrapy.Spider):
         job_description = re.sub(r'"', '', job_description)  # 去除双引号
         job_description = job_description.strip()  # 去除开头和结尾的空格
 
-        # logger.info(f"爬取到岗位详情: ID={job_id}, 描述={job_description}, URL={response.url}")
+        #logger.info(f"爬取到岗位详情: ID={job_id},  URL={response.url}")
          # 从 meta 参数中获取列表页面提取到的数据
         job_title = response.meta['title']
         job_location = response.meta['location']
@@ -60,5 +74,6 @@ class JobSpider(scrapy.Spider):
             'url': response.url,
             'description': job_description
         }
-        logger.info(job_data)
+        logger.info(job_id)
+        # yield job_data
 
