@@ -1,5 +1,5 @@
 
-
+from notify.telegram.bot import telegram_msg
 from utils.logger import logger
 
 
@@ -9,6 +9,6 @@ class NotifyPipeline:
         print("")
         id = item['id']
         logger.info(f'Notify pipeline sending notification...ID:{id}')
-
+        telegram_msg(item['summary'])
         # 通知逻辑
         return item

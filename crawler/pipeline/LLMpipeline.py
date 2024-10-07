@@ -1,11 +1,13 @@
 
+from asyncio import sleep
 from LLM.gemini import GeminiSummary
 from utils.logger import logger
 
 class LLMpipeline:
     def process_item(self, item, spider):
         # 对 item 进行语言模型处理
-        item['summary'] = self.llm_process(item['description'])
+        text = 'Apply URL:'+item['url']+'\n'+item['description']
+        item['summary'] = self.llm_process(text)
         logger.info(item['summary'])
         return item
 
