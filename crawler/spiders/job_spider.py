@@ -1,6 +1,5 @@
 import re
 import scrapy
-from LLM.gemini import GeminiSummary
 from config.Config import Config
 from utils.logger import logger
 
@@ -60,9 +59,9 @@ class JobSpider(scrapy.Spider):
         job_description = re.sub(r'"', '', job_description)  # 去除双引号
         job_description = job_description.strip()  # 去除开头和结尾的空格
 
-        job_summary = GeminiSummary(job_description)
+        #job_summary = GeminiSummary(job_description)
 
-        #logger.info(f"爬取到岗位详情: ID={job_id},  URL={response.url}")
+        logger.info(f"爬取到岗位详情: ID={job_id},  URL={response.url}")
          # 从 meta 参数中获取列表页面提取到的数据
         job_title = response.meta['title']
         job_location = response.meta['location']
@@ -75,9 +74,7 @@ class JobSpider(scrapy.Spider):
             'location': job_location,
             'date': job_date,
             'url': response.url,
-            'description': job_description,
-            'summary': job_summary
+            'description': job_description
         }
-        logger.info(job_summary)
-        # yield job_data
+        yield job_data
 
