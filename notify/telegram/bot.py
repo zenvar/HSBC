@@ -1,4 +1,3 @@
-from telegram import Bot
 from config.Config import Config
 import requests
 
