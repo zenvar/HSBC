@@ -1,3 +1,4 @@
+from multiprocessing import Process
 import time
 import schedule
 from scrapy.crawler import CrawlerProcess
@@ -8,7 +9,17 @@ from config.Config import Config
 config = Config()
 
 # 设置定时任务（例如每隔1小时运行一次爬虫）
-schedule.every(120).seconds.do(start_scrapy)
+#schedule.every(120).seconds.do(start_scrapy)
+
+def run_spider_in_process():
+    p = Process(target=start_scrapy)  # 在新进程中运行爬虫
+    p.start()
+    p.join()  # 等待进程结束
+
+# 设置定时任务（例如每隔1小时运行一次爬虫）
+schedule.every(60).seconds.do(run_spider_in_process)
+
+
 
 if __name__ == "__main__":
     #db = Database(config.get('database','path'))
