@@ -20,7 +20,49 @@ class Database:
                 summary TEXT
             )
         ''')
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS url (
+                id TEXT PRIMARY KEY,
+                url TEXT 
+            )
+        ''')
         self.conn.commit()
+
+    def insert_url(self,url):
+        try:
+            self.cursor.execute('''
+                INSERT INTO url (id, url)
+                VALUES ('1', ?)
+            ''', [url])
+            self.conn.commit()
+            logger.info(f"成功插入数据: {url}")
+        except sqlite3.IntegrityError:
+            logger.warning(f"数据已存在: {url}")
+        except Exception as e:
+            logger.error(f"插入数据失败: {url}")
+
+    def udate_url(self,url):
+        try:
+            self.cursor.execute('''
+                UPDATE url
+                SET url = ?
+                WHERE id = '1'
+            ''', [url])
+            self.conn.commit()
+            logger.info(f"成功插入数据: {url}")
+        except sqlite3.IntegrityError:
+            logger.warning(f"数据已存在: {url}")
+        except Exception as e:
+            logger.error(f"插入数据失败: {url}, 错误: {e}")
+
+    def get_url(self):
+            self.cursor.execute('''
+                SELECT url from url WHERE id = '1'
+        ''')
+            row = self.cursor.fetchone()
+            return row[0] if row else None
+    
+
 
     def insert_job(self, job_data):
         try:

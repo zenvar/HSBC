@@ -2,7 +2,7 @@ import re
 import scrapy
 from config.Config import Config
 from utils.logger import logger
-
+from db.database import Database
 config = Config()
 
 class JobSpider(scrapy.Spider):
@@ -13,9 +13,13 @@ class JobSpider(scrapy.Spider):
     }
     max_pages = 6  # 定义最大翻页数
     page_counter = 1  # 计数当前的页数
+    db = Database(config.get('database', 'path'))
+
+    latest_url = db.get_url()
 
     def parse(self, response):
         results_div = response.css('div.section__content__results')
+        iter = 0
         for article in results_div.css('article.article--result'):
             job_title = article.css('h3 a::text').get()
             job_title = re.sub(r'\s+', ' ', job_title).strip()  # 将多个空白字符替换成一个空格，并去除开头和结尾的空格
@@ -29,6 +33,14 @@ class JobSpider(scrapy.Spider):
             job_date = re.sub(r'\s+', ' ', job_date).strip()  
 
             # logger.info(f"爬取到岗位信息: 标题={job_title}, URL={job_url}, 地址={job_location}, 日期={job_date}")
+            iter = iter+1
+
+            if((self.page_counter == 1)&(iter == 1)):
+                if(job_url == self.latest_url):
+                    return
+                else:
+                    logger.info(f'Update latest url :{job_url}')
+                    self.db.udate_url(job_url)
 
             yield scrapy.Request(
                 job_url, 
