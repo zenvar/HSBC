@@ -7,7 +7,7 @@ WORKDIR /HSBC
 COPY requirements.txt /HSBC/requirements.txt
 
 # 安装依赖
-RUN pip install --no-cache-dir -r requirements.txtdocker
+RUN pip install --no-cache-dir -r requirements.txt
 
 # 复制项目文件
 COPY . /HSBC
