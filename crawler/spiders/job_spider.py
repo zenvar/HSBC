@@ -17,10 +17,12 @@ class JobSpider(scrapy.Spider):
 
     latest_url = db.get_url('1')
     pre_url = db.get_url('2')
+    logger.info(latest_url)
+    logger.info(pre_url)
+
 
     def parse(self, response):
         results_div = response.css('div.section__content__results')
-        tempurl = self.latest_url
         iter = 0
         for article in results_div.css('article.article--result'):
             job_title = article.css('h3 a::text').get()
@@ -39,16 +41,15 @@ class JobSpider(scrapy.Spider):
 
             if((self.page_counter == 1)&(iter == 1)):
                 if((job_url == self.latest_url)|(job_url == self.pre_url)):
+                    logger.info('SKIP!')
                     return
                 else:
                     logger.info(f'Update latest url :{job_url}')
-                    tempurl = job_url
                     self.db.udate_url('1',job_url)
                     self.db.udate_url('2',self.latest_url)
 
             if((job_url == self.latest_url) | (job_url == self.pre_url)):
-                self.pre_url = self.latest_url
-                self.latest_url = tempurl
+                logger.info('SKIP!')
                 return
 
 
@@ -83,7 +84,7 @@ class JobSpider(scrapy.Spider):
 
         #job_summary = GeminiSummary(job_description)
 
-        logger.info(f"爬取到岗位详情: ID={job_id},  URL={response.url}")
+        #logger.info(f"爬取到岗位详情: ID={job_id},  URL={response.url}")
          # 从 meta 参数中获取列表页面提取到的数据
         job_title = response.meta['title']
         job_location = response.meta['location']

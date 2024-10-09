@@ -80,7 +80,7 @@ class Database:
                 job_data['summary']  # 添加 summary 字段
             ))
             self.conn.commit()
-            logger.info(f"成功插入数据: {job_data['id']}")
+            #logger.info(f"成功插入数据: {job_data['id']}")
         except sqlite3.IntegrityError:
             logger.warning(f"数据已存在: {job_data['id']}")
         except Exception as e:

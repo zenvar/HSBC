@@ -8,7 +8,7 @@ class LLMpipeline:
         # 对 item 进行语言模型处理
         text = 'Apply URL:'+item['url']+'\n'+item['description']
         item['summary'] = self.llm_process(text)
-        logger.info(item['summary'])
+        #logger.info(item['summary'])
         return item
 
     def llm_process(self, raw_data):

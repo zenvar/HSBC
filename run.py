@@ -16,7 +16,7 @@ def run_spider_in_process():
     p.join()  # 等待进程结束
 
 # 设置定时任务（例如每隔1小时运行一次爬虫）
-schedule.every(30).seconds.do(run_spider_in_process)
+schedule.every(90).seconds.do(run_spider_in_process)
 
 
 

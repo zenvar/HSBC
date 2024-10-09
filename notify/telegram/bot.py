@@ -26,6 +26,6 @@ def telegram_msg(msg):
 
     # 检查响应
     if response.status_code == 200:
-        print('Message sent successfully!')
+        print('')
     else:
         print(f"Failed to send message. Error: {response.text}")
