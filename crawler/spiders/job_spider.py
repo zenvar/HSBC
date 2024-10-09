@@ -15,7 +15,8 @@ class JobSpider(scrapy.Spider):
     page_counter = 1  # 计数当前的页数
     db = Database(config.get('database', 'path'))
 
-    latest_url = db.get_url()
+    latest_url = db.get_url('1')
+    pre_url = db.get_url('2')
 
     def parse(self, response):
         results_div = response.css('div.section__content__results')
@@ -36,11 +37,16 @@ class JobSpider(scrapy.Spider):
             iter = iter+1
 
             if((self.page_counter == 1)&(iter == 1)):
-                if(job_url == self.latest_url):
+                if((job_url == self.latest_url)|(job_url == self.pre_url)):
                     return
                 else:
                     logger.info(f'Update latest url :{job_url}')
-                    self.db.udate_url(job_url)
+                    self.db.udate_url('1',job_url)
+                    self.db.udate_url('2',self.latest_url)
+
+            if((job_url == self.latest_url) | (job_url == self.pre_url)):
+                return
+
 
             yield scrapy.Request(
                 job_url, 

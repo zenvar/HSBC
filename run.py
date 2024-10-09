@@ -1,7 +1,6 @@
 from multiprocessing import Process
 import time
 import schedule
-from scrapy.crawler import CrawlerProcess
 from crawler.spiders.start import start_scrapy
 from db.database import Database
 from config.Config import Config
@@ -17,13 +16,15 @@ def run_spider_in_process():
     p.join()  # 等待进程结束
 
 # 设置定时任务（例如每隔1小时运行一次爬虫）
-schedule.every(60).seconds.do(run_spider_in_process)
+schedule.every(180).seconds.do(run_spider_in_process)
 
 
 
 if __name__ == "__main__":
     #db = Database(config.get('database','path'))
     #db.insert_url(config.get('url','latest'))
+    #db.insert_url('2','https://mycareer.hsbc.com/en_GB/external/PipelineDetail/Software-Engineer/246371')
+    
     # 启动定时任务调度器
     while True:
         schedule.run_pending()  # 检查是否有任务需要执行
