@@ -11,7 +11,7 @@ class JobSpider(scrapy.Spider):
     custom_settings = {
         'USER_AGENT': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36'
     }
-    max_pages = 6  # 定义最大翻页数
+    max_pages = 3  # 定义最大翻页数
     page_counter = 1  # 计数当前的页数
     db = Database(config.get('database', 'path'))
 
@@ -20,6 +20,7 @@ class JobSpider(scrapy.Spider):
 
     def parse(self, response):
         results_div = response.css('div.section__content__results')
+        tempurl = self.latest_url
         iter = 0
         for article in results_div.css('article.article--result'):
             job_title = article.css('h3 a::text').get()
@@ -41,10 +42,13 @@ class JobSpider(scrapy.Spider):
                     return
                 else:
                     logger.info(f'Update latest url :{job_url}')
+                    tempurl = job_url
                     self.db.udate_url('1',job_url)
                     self.db.udate_url('2',self.latest_url)
 
             if((job_url == self.latest_url) | (job_url == self.pre_url)):
+                self.pre_url = self.latest_url
+                self.latest_url = tempurl
                 return
 
 
