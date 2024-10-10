@@ -15,13 +15,14 @@ class JobSpider(scrapy.Spider):
     page_counter = 1  # 计数当前的页数
     db = Database(config.get('database', 'path'))
 
-    latest_url = db.get_url('1')
-    pre_url = db.get_url('2')
-    logger.info(latest_url)
-    logger.info(pre_url)
+    
 
 
     def parse(self, response):
+        latest_url = self.db.get_url('1')
+        pre_url = self.db.get_url('2')
+        logger.info(latest_url)
+        logger.info(pre_url)
         results_div = response.css('div.section__content__results')
         iter = 0
         for article in results_div.css('article.article--result'):
@@ -39,16 +40,16 @@ class JobSpider(scrapy.Spider):
             # logger.info(f"爬取到岗位信息: 标题={job_title}, URL={job_url}, 地址={job_location}, 日期={job_date}")
             iter = iter+1
 
-            if((self.page_counter == 1)&(iter == 1)):
-                if((job_url == self.latest_url)|(job_url == self.pre_url)):
+            if(iter == 1):
+                if((job_url == latest_url)|(job_url == pre_url)):
                     logger.info('SKIP!')
                     return
                 else:
                     logger.info(f'Update latest url :{job_url}')
                     self.db.udate_url('1',job_url)
-                    self.db.udate_url('2',self.latest_url)
+                    self.db.udate_url('2',latest_url)
 
-            if((job_url == self.latest_url) | (job_url == self.pre_url)):
+            if((job_url == latest_url) | (job_url == pre_url)):
                 logger.info('SKIP!')
                 return
 
@@ -63,12 +64,10 @@ class JobSpider(scrapy.Spider):
                 })
             
         # 翻页逻辑
-        if self.page_counter < self.max_pages:  # 如果当前页数小于最大页数
-            next_page_url = response.css('a.paginationNextLink::attr(href)').get()  # 获取下一页的链接
-            if next_page_url:  # 如果存在下一页的链接
-                self.page_counter += 1  # 增加当前页数计数
-                logger.info('-----Next page, page %s ------',self.page_counter)
-                yield scrapy.Request(next_page_url, callback=self.parse)  # 请求下一页
+        #if next_page_url  # 如果存在下一页的链接
+                #elf.page_counter += 1  # 增加当前页数计数
+                #logger.info('-----Next page, page %s ------',self.page_counter)
+                #yield scrapy.Request(next_page_url, callback=self.parse)  # 请求下一页
 
 
     def parse_job_detail(self, response):

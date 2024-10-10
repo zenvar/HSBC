@@ -15,7 +15,8 @@ def start_scrapy():
     'CONCURRENT_REQUESTS': 32,  # 控制全局并发请求数
     'CONCURRENT_REQUESTS_PER_DOMAIN': 16,  # 控制每个域名的并发请求数
     'DOWNLOAD_DELAY': 0.25,  # 关闭下载延迟
-    'CONCURRENT_ITEMS' : 1  # 一次只允许一个 item 被处理
+    'CONCURRENT_ITEMS' : 1,  # 一次只允许一个 item 被处理
+    'LOG_LEVEL' : 'WARNING'
 
     }
     # 传入配置 settings=custom_settings
